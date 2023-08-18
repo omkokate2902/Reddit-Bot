@@ -1,0 +1,10 @@
+certifi==2023.7.22
+charset-normalizer==3.2.0
+idna==3.4
+praw==7.7.1
+prawcore==2.3.0
+requests==2.31.0
+toml==0.10.2
+update-checker==0.18.0
+urllib3==2.0.4
+websocket-client==1.6.1
