@@ -4,3 +4,6 @@ client_secret = "cWVQiNW6S2JgNqHPZT-54_I5_m9B4A"
 user_agent = "bot2:v1.0 (by /u/PatientStreet3556)"
 username = "PatientStreet3556"
 password = "password1234"
+subreddit_name = "askreddit"
+comment_limit = 10
+exclude_nsfw = true  # Set this to 'false' to include NSFW posts
