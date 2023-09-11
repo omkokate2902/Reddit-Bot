@@ -39,6 +39,7 @@ def get_top_hot_posts(limit=3):
             for post in hot_posts:
                 if not post.over_18 and (not exclude_nsfw or (exclude_nsfw and not post.over_18)):
                     post_info = {
+                        "id": post.id,
                         "title": post.title,
                         "url": post.url,
                         "comments": []
@@ -57,6 +58,7 @@ def get_top_hot_posts(limit=3):
 
             for i, post in enumerate(top_hot_posts, start=1):
                 print(f"Post {i}:")
+                print(f"ID: {post['id']}")
                 print(f"Title: {post['title']}")
                 print(f"URL: {post['url']}")
                 print("Comments:")
@@ -64,7 +66,7 @@ def get_top_hot_posts(limit=3):
                     print(f"Comment {j}: {comment}")
                 print("\n")
             
-            return post_info
+            return top_hot_posts
 
         except praw.exceptions.PRAWException as e:
             print("PRAW Error:", e)
@@ -72,4 +74,5 @@ def get_top_hot_posts(limit=3):
             print("Error:", e)
 
 if __name__ == "__main__":
-    get_top_hot_posts(limit)
+    limit=0
+    posts = get_top_hot_posts(limit)
