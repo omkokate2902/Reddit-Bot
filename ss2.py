@@ -1,36 +1,54 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service as ChromeService
+from playwright.sync_api import sync_playwright, ViewportSize
+import os
 
+def capture_screenshots(post_url, comment_urls, output_folder):
 
-# Initialize the WebDriver
-driver = webdriver.Chrome(executable_path='/Users/omkokate/Desktop/reddit_bot/myenv/lib/python3.10/site-packages/selenium/webdriver/chromium')
+    chromium_executable_path = './opt/homebrew/bin/chromium'
 
-# Navigate to the web page
-driver.get('https://www.reddit.com/r/AskReddit/comments/16fz24y/what_is_your_favorite_sport/')  # Replace with the URL of the web page you want to capture
+    # Set the PW_BROWSER_PATH environment variable to the Chromium path
+    os.environ['PW_BROWSER_PATH'] = chromium_executable_path
 
-# Specify the text content you want to locate
-target_text = "Rugby, because it's like football, but for people who can't afford pads."
+    with sync_playwright() as p:
+        # Launch a headless Chromium browser
+        browser = p.chromium.launch(headless=True)
 
-try:
-    # Use XPath to locate the element by its text content
-    comment_element = driver.find_element(By.XPATH, f'//*[contains(text(), "{target_text}")]')
+        # Create a new browser context with a specific viewport size
+        context = browser.new_context(viewport=ViewportSize(width=1920, height=1080))
 
-    # Scroll the comment element into view
-    driver.execute_script("arguments[0].scrollIntoView();", comment_element)
+        # Create a new page in the context
+        page = context.new_page()
 
-    # Capture a screenshot of the element
-    comment_screenshot = comment_element.screenshot_as_png
+        try:
+            # Navigate to the Reddit post URL
+            page.goto(post_url)
 
-    # Save the screenshot to a file
-    with open('comment.png', 'wb') as screenshot_file:
-        screenshot_file.write(comment_screenshot)
+            # Capture a screenshot of the post title
+            title_screenshot_path = f"{output_folder}/title.png"
+            title_element = page.locator('your_selector_for_title_element')
+            title_element.screenshot(path=title_screenshot_path)
 
-    print("Screenshot captured and saved successfully!")
+            # Iterate through comment URLs and capture screenshots
+            for index, comment_url in enumerate(comment_urls, start=1):
+                page.goto(comment_url)
 
-except Exception as e:
-    print(f"An error occurred: {str(e)}")
+                # Capture a screenshot of the comment
+                comment_screenshot_path = f"{output_folder}/comment_{index}.png"
+                comment_element = page.locator('your_selector_for_comment_element')
+                comment_element.screenshot(path=comment_screenshot_path)
 
-finally:
-    # Close the WebDriver
-    driver.quit()
+        finally:
+            # Close the browser to release resources
+            browser.close()
+
+# Example usage:
+if __name__ == "__main__":
+    post_url = "https://www.reddit.com/r/subreddit/comments/post_id/"
+    comment_urls = [
+        "https://www.reddit.com/r/subreddit/comments/post_id/comment/comment_id1/",
+        "https://www.reddit.com/r/subreddit/comments/post_id/comment/comment_id2/",
+        # Add more comment URLs as needed
+    ]
+    output_folder = "assets/screenshots"
+
+    # Call the function to capture screenshots
+    capture_screenshots(post_url, comment_urls, output_folder)
