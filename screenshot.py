@@ -1,69 +1,55 @@
-import praw
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as ChromeService
-from PIL import Image
+from playwright.sync_api import sync_playwright, ViewportSize
 import os
-import time
 
-# Reddit API credentials
-reddit = praw.Reddit(
-    client_id="I4ZRQ8ZE7Cpz8tkbpdCp5A",
-    client_secret="cWVQiNW6S2JgNqHPZT-54_I5_m9B4A",
-    user_agent="bot2:v1.0 (by /u/PatientStreet3556)"
-)
+def capture_screenshots(post_url, comment_urls, output_folder):
 
-# Get the post details
-post = reddit.submission(id='16fbfz5')
+    chromium_executable_path = './opt/homebrew/Caskroom/chromium/latest'
 
-# Configure Chrome options (optional)
-chrome_options = webdriver.ChromeOptions()
-chrome_options.add_argument('--headless')  # Run Chrome in headless mode (without GUI)
+    # Set the PW_BROWSER_PATH environment variable to the Chromium path
+    os.environ['PW_BROWSER_PATH'] = chromium_executable_path
 
-# Create a Chrome driver instance
-driver = webdriver.Chrome(options=chrome_options)
+    with sync_playwright() as p:
+        # Launch a headless Chromium browser
+        browser = p.chromium.launch(headless=True)
 
-# Navigate to the Reddit post URL
-driver.get(post.url)
+        # Create a new browser context with a specific viewport size
+        context = browser.new_context(viewport=ViewportSize(width=1920, height=1080))
 
-# Capture a screenshot
-driver.save_screenshot('assets/screenshots/reddit_post_screenshot.png')
+        # Create a new page in the context
+        page = context.new_page()
 
-# Load the screenshot using Pillow
-screenshot = Image.open('assets/screenshots/reddit_post_screenshot.png')
+        try:
+            # Navigate to the Reddit post URL
+            page.goto(post_url)
 
-# Define the coordinates to crop the question and username
-# You'll need to adjust these coordinates based on the specific layout of the Reddit post page
-left = 0  # Adjust this value as needed
-top = 150   # Adjust this value as needed
-right = 900  # Adjust this value as needed
-bottom = 500  # Adjust this value as needed
+            # Capture a screenshot of the post title
+            title_screenshot_path = f"{output_folder}/title.png"
+            title_element = page.locator('#t3_16wa47t')
+            title_element.screenshot(path=title_screenshot_path)
 
-# Crop the screenshot
-cropped_image = screenshot.crop((left, top, right, bottom))
+            # Iterate through comment URLs and capture screenshots
+            for index, comment_url in enumerate(comment_urls, start=1):
+                page.goto(comment_url)
 
-# Save the cropped image
-cropped_image.save('assets/screenshots/reddit_question_username.png')
+                # Capture a screenshot of the comment
+                comment_screenshot_path = f"{output_folder}/comment_{index}.png"
+                comment_element = page.locator('#t1_k2xck8k > div.Comment.t1_k2xck8k.P8SGAKMtRxNwlmLz1zdJu.HZ-cv9q391bm8s7qT54B3._1z5rdmX8TDr6mqwNv7A70U')
+                
+                comment_element.screenshot(path=comment_screenshot_path)
 
-# Delete the original screenshot file if it exists
-if os.path.exists('assets/screenshots/reddit_post_screenshot.png'):
-    os.remove('assets/screenshots/reddit_post_screenshot.png')
+        finally:
+            # Close the browser to release resources
+            browser.close()
 
-comment_urls = [
-    "https://www.reddit.com/r/AskReddit/comments/16fbfz5/comment/k00qpz9",
-    "https://www.reddit.com/r/AskReddit/comments/16fbfz5/comment/k016kud",
-    "https://www.reddit.com/r/AskReddit/comments/16fbfz5/comment/k01b3lq",
-    "https://www.reddit.com/r/AskReddit/comments/16fbfz5/comment/k0155fd",
-]
+# Example usage:
+if __name__ == "__main__":
+    post_url = "https://www.reddit.com/r/AskReddit/comments/16wa47t/whats_something_common_that_men_do_that_women/"
+    comment_urls = [
+        "https://www.reddit.com/r/AskReddit/comments/16wa47t/whats_something_common_that_men_do_that_women/",
+        "https://www.reddit.com/r/AskReddit/comments/16wa47t/whats_something_common_that_men_do_that_women/",
+        # Add more comment URLs as needed
+    ]
+    output_folder = "assets/screenshots"
 
-# Loop through the comment URLs and capture screenshots
-for i, comment_url in enumerate(comment_urls, start=1):
-    # Navigate to the comment URL
-    driver.get(comment_url)
-    time.sleep(5)
-
-    # Capture a screenshot of the comment page
-    screenshot_filename = f'assets/screenshots/comment_{i}.png'
-    driver.save_screenshot(screenshot_filename)
-
-# Close the Chrome driver
-driver.quit()
+    # Call the function to capture screenshots
+    capture_screenshots(post_url, comment_urls, output_folder)
