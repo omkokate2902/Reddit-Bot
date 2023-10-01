@@ -1,13 +1,6 @@
 from playwright.sync_api import sync_playwright, ViewportSize
-import os
 
 def capture_screenshots(post_url, comment_urls, output_folder):
-
-    chromium_executable_path = './opt/homebrew/Caskroom/chromium/latest'
-
-    # Set the PW_BROWSER_PATH environment variable to the Chromium path
-    os.environ['PW_BROWSER_PATH'] = chromium_executable_path
-
     with sync_playwright() as p:
         # Launch a headless Chromium browser
         browser = p.chromium.launch(headless=True)
@@ -22,9 +15,16 @@ def capture_screenshots(post_url, comment_urls, output_folder):
             # Navigate to the Reddit post URL
             page.goto(post_url)
 
+            # Check if the NSFW button is visible and click it if necessary
+            nsfw_button_selector = 'your_selector_for_nsfw_button'
+            if page.locator(nsfw_button_selector).is_visible():
+                print("NSFW content detected. Clicking the NSFW button...")
+                page.locator(nsfw_button_selector).click()
+                page.wait_for_load_state()  # Wait for the page to fully load again
+
             # Capture a screenshot of the post title
             title_screenshot_path = f"{output_folder}/title.png"
-            title_element = page.locator('#t3_16wa47t')
+            title_element = page.locator('#t3_16wtqch')
             title_element.screenshot(path=title_screenshot_path)
 
             # Iterate through comment URLs and capture screenshots
@@ -33,8 +33,8 @@ def capture_screenshots(post_url, comment_urls, output_folder):
 
                 # Capture a screenshot of the comment
                 comment_screenshot_path = f"{output_folder}/comment_{index}.png"
-                comment_element = page.locator('#t1_k2xck8k > div.Comment.t1_k2xck8k.P8SGAKMtRxNwlmLz1zdJu.HZ-cv9q391bm8s7qT54B3._1z5rdmX8TDr6mqwNv7A70U')
-                
+                comment_element = page.locator('#t3_12hmbug > div > div._3xX726aBn29LDbsDtzr_6E._1Ap4F5maDtT1E1YuCiaO0r.D3IL3FD0RFy_mkKLPwL4 > div > div > button')
+
                 comment_element.screenshot(path=comment_screenshot_path)
 
         finally:
@@ -43,10 +43,10 @@ def capture_screenshots(post_url, comment_urls, output_folder):
 
 # Example usage:
 if __name__ == "__main__":
-    post_url = "https://www.reddit.com/r/AskReddit/comments/16wa47t/whats_something_common_that_men_do_that_women/"
+    post_url = "https://www.reddit.com/r/AskReddit/comments/16wtqch/men_who_suddenly_lost_your_interest_in_someone"
     comment_urls = [
-        "https://www.reddit.com/r/AskReddit/comments/16wa47t/whats_something_common_that_men_do_that_women/",
-        "https://www.reddit.com/r/AskReddit/comments/16wa47t/whats_something_common_that_men_do_that_women/",
+        "https://www.reddit.com/r/AskReddit/comments/16wtqch/men_who_suddenly_lost_your_interest_in_someone/k2z3cgf",
+        "https://www.reddit.com/r/AskReddit/comments/16wtqch/men_who_suddenly_lost_your_interest_in_someone/k2yxli8",
         # Add more comment URLs as needed
     ]
     output_folder = "assets/screenshots"

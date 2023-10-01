@@ -50,7 +50,11 @@ def get_top_hot_posts(limit=3):
                         if not comment.stickied and not comment.body == '[removed]' and not comment.body == '[deleted]':
                             cleaned_comment = beautify_comment(comment.body)
                             if cleaned_comment:
-                                post_info["comments"].append(cleaned_comment)
+                                comment_info = {
+                                    "comment_text": cleaned_comment,
+                                    "comment_url": f"{post.url}{comment.id}/"
+                                }
+                                post_info["comments"].append(comment_info)
 
                     top_hot_posts.append(post_info)
                     if len(top_hot_posts) >= limit:
@@ -62,8 +66,9 @@ def get_top_hot_posts(limit=3):
                 print(f"Title: {post['title']}")
                 print(f"URL: {post['url']}")
                 print("Comments:")
-                for j, comment in enumerate(post['comments'], start=1):
-                    print(f"Comment {j}: {comment}")
+                for j, comment_info in enumerate(post['comments'], start=1):
+                    print(f"Comment {j}: {comment_info['comment_text']}")
+                    print(f"Comment URL {j}: {comment_info['comment_url']}")
                 print("\n")
             
             return top_hot_posts
@@ -74,5 +79,5 @@ def get_top_hot_posts(limit=3):
             print("Error:", e)
 
 if __name__ == "__main__":
-    limit=0
+    limit = 0
     posts = get_top_hot_posts(limit)
