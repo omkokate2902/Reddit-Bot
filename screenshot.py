@@ -31,10 +31,15 @@ def capture_screenshots(post_url, comment_urls, output_folder):
             for index, comment_url in enumerate(comment_urls, start=1):
                 page.goto(comment_url)
 
+                # Wait for 5 seconds to allow the page to load comments
+                page.wait_for_timeout(5000)  # Wait for 5 seconds
+
                 # Capture a screenshot of the comment
                 comment_screenshot_path = f"{output_folder}/comment_{index}.png"
-                comment_element = page.locator('#t3_12hmbug > div > div._3xX726aBn29LDbsDtzr_6E._1Ap4F5maDtT1E1YuCiaO0r.D3IL3FD0RFy_mkKLPwL4 > div > div > button')
-
+                comment_id = 'preview_block'  # Replace with the actual 'id' of the comment div
+                comment_selector = f'#{comment_id}'
+                page.wait_for_selector(comment_selector, timeout=10000)  # Adjust the timeout as needed
+                comment_element = page.locator(comment_selector)
                 comment_element.screenshot(path=comment_screenshot_path)
 
         finally:
@@ -45,8 +50,8 @@ def capture_screenshots(post_url, comment_urls, output_folder):
 if __name__ == "__main__":
     post_url = "https://www.reddit.com/r/AskReddit/comments/16wtqch/men_who_suddenly_lost_your_interest_in_someone"
     comment_urls = [
-        "https://www.reddit.com/r/AskReddit/comments/16wtqch/men_who_suddenly_lost_your_interest_in_someone/k2z3cgf",
-        "https://www.reddit.com/r/AskReddit/comments/16wtqch/men_who_suddenly_lost_your_interest_in_someone/k2yxli8",
+        "https://publish.reddit.com/embed?url=https://www.reddit.com/r/AskReddit/comments/16wtqch/comment/k2z3cgf",
+        "https://publish.reddit.com/embed?url=https://www.reddit.com/r/AskReddit/comments/16wtqch/men_who_suddenly_lost_your_interest_in_someone/k2yxli8",
         # Add more comment URLs as needed
     ]
     output_folder = "assets/screenshots"
