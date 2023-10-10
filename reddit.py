@@ -16,7 +16,7 @@ def beautify_comment(comment_text):
     cleaned_comment = re.sub(r'http\S+', '', comment_text)
     return cleaned_comment
 
-def get_top_hot_posts(limit=3):
+def get_top_hot_posts(limit):
     config = read_config("config.toml")
     if config:
         try:
@@ -71,7 +71,11 @@ def get_top_hot_posts(limit=3):
                     print(f"Comment URL {j}: {comment_info['comment_url']}")
                 print("\n")
             
-            return top_hot_posts
+            post_id = top_hot_posts[0]['id']
+            post_url = top_hot_posts[0]['url']
+            comment_urls = [comment['comment_url'] for comment in top_hot_posts[0]['comments']]
+            
+            return post_id,post_url,comment_urls
 
         except praw.exceptions.PRAWException as e:
             print("PRAW Error:", e)
@@ -79,5 +83,5 @@ def get_top_hot_posts(limit=3):
             print("Error:", e)
 
 if __name__ == "__main__":
-    limit = 0
+    limit = 1
     posts = get_top_hot_posts(limit)

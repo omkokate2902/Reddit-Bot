@@ -1,6 +1,14 @@
 from playwright.sync_api import sync_playwright, ViewportSize
+from PIL import Image
 
-def capture_screenshots(post_url, comment_urls, output_folder):
+def capture_screenshots(post_id,post_url, comment_urlss):
+    output_folder="assets/screenshots"
+    post_id=post_id
+    
+    prefix = "https://publish.reddit.com/embed?url="
+
+    comment_urls = [f"{prefix}{url}" for url in comment_urlss]
+
     with sync_playwright() as p:
         # Launch a headless Chromium browser
         browser = p.chromium.launch(headless=True)
@@ -24,8 +32,10 @@ def capture_screenshots(post_url, comment_urls, output_folder):
 
             # Capture a screenshot of the post title
             title_screenshot_path = f"{output_folder}/title.png"
-            title_element = page.locator('#t3_16wtqch')
+            title_element = page.locator(f'#t3_{post_id}')
             title_element.screenshot(path=title_screenshot_path)
+
+            print("Captured title screenshot...\n")
 
             # Iterate through comment URLs and capture screenshots
             for index, comment_url in enumerate(comment_urls, start=1):
@@ -42,19 +52,18 @@ def capture_screenshots(post_url, comment_urls, output_folder):
                 comment_element = page.locator(comment_selector)
                 comment_element.screenshot(path=comment_screenshot_path)
 
+                # Open the captured screenshot with PIL
+                image = Image.open(comment_screenshot_path)
+
+                crop_rect = (0, 0, image.width, image.height - 50)
+                cropped_image = image.crop(crop_rect)
+
+                cropped_image.save(comment_screenshot_path)
+                
+                print(f"Captured comment_{index} screenshot...\n")
+
+
+
         finally:
             # Close the browser to release resources
             browser.close()
-
-# Example usage:
-if __name__ == "__main__":
-    post_url = "https://www.reddit.com/r/AskReddit/comments/16wtqch/men_who_suddenly_lost_your_interest_in_someone"
-    comment_urls = [
-        "https://publish.reddit.com/embed?url=https://www.reddit.com/r/AskReddit/comments/16wtqch/comment/k2z3cgf",
-        "https://publish.reddit.com/embed?url=https://www.reddit.com/r/AskReddit/comments/16wtqch/men_who_suddenly_lost_your_interest_in_someone/k2yxli8",
-        # Add more comment URLs as needed
-    ]
-    output_folder = "assets/screenshots"
-
-    # Call the function to capture screenshots
-    capture_screenshots(post_url, comment_urls, output_folder)
