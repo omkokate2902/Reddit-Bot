@@ -74,8 +74,12 @@ def get_top_hot_posts(limit):
             post_id = top_hot_posts[0]['id']
             post_url = top_hot_posts[0]['url']
             comment_urls = [comment['comment_url'] for comment in top_hot_posts[0]['comments']]
+
+            post_title = top_hot_posts[0]['title']
+            comments = [comment['comment_text'] for comment in top_hot_posts[0]['comments']]
+            post_and_comments = [post_title] + comments
             
-            return post_id,post_url,comment_urls
+            return post_id,post_url,comment_urls,post_and_comments
 
         except praw.exceptions.PRAWException as e:
             print("PRAW Error:", e)

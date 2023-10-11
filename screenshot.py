@@ -60,7 +60,8 @@ def capture_screenshots(post_id,post_url, comment_urlss):
 
                 cropped_image.save(comment_screenshot_path)
                 
-                print(f"Captured comment_{index} screenshot...\n")
+                print(f"Captured comment_{index} screenshot...")
+                print("\n")
 
 
 
