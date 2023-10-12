@@ -35,7 +35,7 @@ def capture_screenshots(post_id,post_url, comment_urlss):
             title_element = page.locator(f'#t3_{post_id}')
             title_element.screenshot(path=title_screenshot_path)
 
-            print("Captured title screenshot...\n")
+            print("Captured title screenshot...")
 
             # Iterate through comment URLs and capture screenshots
             for index, comment_url in enumerate(comment_urls, start=1):
@@ -61,7 +61,7 @@ def capture_screenshots(post_id,post_url, comment_urlss):
                 cropped_image.save(comment_screenshot_path)
                 
                 print(f"Captured comment_{index} screenshot...")
-                print("\n")
+            print("\n")
 
 
 
