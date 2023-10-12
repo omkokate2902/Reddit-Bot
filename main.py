@@ -1,4 +1,4 @@
-import reddit, screenshot, text2speech, bg_vid_download
+import reddit, screenshot, text2speech, bg_vid_download, short_clip, video_gen
 
 if __name__ == "__main__":
 
@@ -10,5 +10,6 @@ if __name__ == "__main__":
 
     bg_vid_download.download_youtube_video()
 
+    short_clip.create_random_short_video()
 
-
+    video_gen.create_final_video()

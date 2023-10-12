@@ -8,15 +8,11 @@ def convert_text_to_speech(text_list):
         os.makedirs(output_directory)
 
     # Iterate through the list and convert each text to MP3
-    for index, text in enumerate(text_list):
+    for index, text in enumerate(text_list, start=1):
         # Initialize the gTTS object with the text
         tts = gTTS(text, lang='en')
 
-        # Determine the filename based on the index
-        if index == 0:
-            file_name = "title_voice.mp3"
-        else:
-            file_name = f"comment_{index}_voice.mp3"
+        file_name = f"audio_{index}.mp3"
 
         # Save the generated MP3 to a file in the specified directory
         file_path = os.path.join(output_directory, file_name)

@@ -1,9 +1,8 @@
 from playwright.sync_api import sync_playwright, ViewportSize
 from PIL import Image
 
-def capture_screenshots(post_id,post_url, comment_urlss):
-    output_folder="assets/screenshots"
-    post_id=post_id
+def capture_screenshots(post_id, post_url, comment_urlss):
+    output_folder = "assets/screenshots"
     
     prefix = "https://publish.reddit.com/embed?url="
 
@@ -31,11 +30,24 @@ def capture_screenshots(post_id,post_url, comment_urlss):
                 page.wait_for_load_state()  # Wait for the page to fully load again
 
             # Capture a screenshot of the post title
-            title_screenshot_path = f"{output_folder}/title.png"
+            title_screenshot_path = f"{output_folder}/screenshot_1.png"
             title_element = page.locator(f'#t3_{post_id}')
             title_element.screenshot(path=title_screenshot_path)
 
-            print("Captured title screenshot...")
+            title_screenshot_path = f"{output_folder}/screenshot_1.png"
+            image = Image.open(title_screenshot_path)
+
+            # Resize the image to a width of 600 pixels while maintaining the aspect ratio
+            new_width = 600
+            w_percent = (new_width / float(image.size[0]))
+            new_height = int((float(image.size[1]) * float(w_percent)))
+            resized_image = image.resize((new_width, new_height), Image.BILINEAR)
+
+
+            # Save the resized image
+            resized_image.save(title_screenshot_path)
+
+            print("Captured screenshot_1 (title)...")
 
             # Iterate through comment URLs and capture screenshots
             for index, comment_url in enumerate(comment_urls, start=1):
@@ -45,7 +57,7 @@ def capture_screenshots(post_id,post_url, comment_urlss):
                 page.wait_for_timeout(5000)  # Wait for 5 seconds
 
                 # Capture a screenshot of the comment
-                comment_screenshot_path = f"{output_folder}/comment_{index}.png"
+                comment_screenshot_path = f"{output_folder}/screenshot_{index + 1}.png"
                 comment_id = 'preview_block'  # Replace with the actual 'id' of the comment div
                 comment_selector = f'#{comment_id}'
                 page.wait_for_selector(comment_selector, timeout=10000)  # Adjust the timeout as needed
@@ -60,10 +72,8 @@ def capture_screenshots(post_id,post_url, comment_urlss):
 
                 cropped_image.save(comment_screenshot_path)
                 
-                print(f"Captured comment_{index} screenshot...")
+                print(f"Captured screenshot_{index + 1} (comment)...")
             print("\n")
-
-
 
         finally:
             # Close the browser to release resources
