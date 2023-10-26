@@ -2,7 +2,7 @@ from moviepy.editor import VideoFileClip, ImageClip, CompositeVideoClip, AudioFi
 import os
 
 def create_final_video():
-
+    
     # Input video file path (90-second video)
     video_path = 'assets/bg_vid/short_video.mp4'
 
@@ -50,10 +50,10 @@ def create_final_video():
         # Calculate the remaining time available in the 90-second video
         remaining_time = 90 - total_duration
 
-        # Check if the audio duration exceeds the remaining time
-        if audio_clip.duration > remaining_time:
-            # Trim the audio to fit within the remaining time
-            audio_clip = audio_clip.subclip(0, remaining_time)
+        # Check if adding the next comment would exceed 90 seconds
+        if total_duration + audio_clip.duration > 90:
+            # End the video on the previous comment
+            break
 
         # Set the image duration to match the audio duration
         image_duration = audio_clip.duration
@@ -66,16 +66,17 @@ def create_final_video():
         current_time += image_duration
         total_duration += image_duration
 
-        # Check if the total duration exceeds 90 seconds
-        if total_duration >= 90:
-            break
-
     # Concatenate all the composite clips
     final_clip = CompositeVideoClip(composite_clips, size=video_clip.size)
 
-    # Trim the final clip to 90 seconds if it exceeds
-    if final_clip.duration > 90:
-        final_clip = final_clip.subclip(0, 90)
+    # If the last comment's audio ends, end the video
+    if total_duration < 90:
+        audio_duration = audio_clip.duration
+        remaining_time = 90 - total_duration
+        final_clip = final_clip.subclip(0, total_duration + audio_duration)
+
+    # Trim the final video to the actual duration of the last audio clip
+    final_clip = final_clip.subclip(0, total_duration)
 
     # Write the final output video
     final_clip.write_videofile(output_path, codec='libx264', audio_codec='aac', fps=video_clip.fps)

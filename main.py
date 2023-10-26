@@ -1,15 +1,29 @@
 import reddit, screenshot, text2speech, bg_vid_download, short_clip, video_gen
 
-if __name__ == "__main__":
 
-    post_id,post_url,comment_urls,post_and_comments=reddit.get_top_hot_posts(limit=1)
+post_info = reddit.main()
 
-    screenshot.capture_screenshots(post_id,post_url,comment_urls)
+if post_info:
+    post_id = post_info["id"]
+    post_url = post_info["url"]
+    comment_urls = [comment["comment_url"] for comment in post_info["comments"]]
+    post_and_comments = {
+        "post_id": post_id,
+        "post_url": post_url,
+        "comment_urls": comment_urls,
+        "post_info": post_info
+    }
+    # print(post_and_comments)
+else:
+    print("No suitable post found in the specified subreddit.")
 
-    text2speech.convert_text_to_speech(post_and_comments)
 
-    bg_vid_download.download_youtube_video()
+screenshot.capture_screenshots(post_id,post_url,comment_urls)
 
-    short_clip.create_random_short_video()
+text2speech.convert_text_to_speech(post_and_comments)
 
-    video_gen.create_final_video()
+bg_vid_download.download_youtube_video()
+
+short_clip.create_random_short_video()
+
+video_gen.create_final_video()
