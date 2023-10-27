@@ -189,6 +189,9 @@ def get_post_by_url(post_url, check_comments=True, min_comments=5, max_comments=
                             post_info["comments"].append(comment_info)
                             comments_count += 1
 
+                            if comments_count >= max_comments:
+                                break
+
                     if not post_info["comments"]:
                         print("No suitable comments found for the specified post.")
                         return None
@@ -203,30 +206,20 @@ def get_post_by_url(post_url, check_comments=True, min_comments=5, max_comments=
         except Exception as e:
             print("Error:", e)
 
-def main():
-    print("Options:")
-    print("1. Fetch Hottest Post")
-    print("2. Fetch Top Post by Time Filter")
-    print("3. Fetch Post by URL")
-
-    user_choice = input("Enter your choice (1/2/3): ")
-    subreddit_name = None
+def main(user_choice, subreddit_name, exclude_nsfw, time_filter, post_url):
     exclude_nsfw = False
 
     if user_choice in ("1", "2"):
-        subreddit_name = input("Enter the subreddit name: ")
-        exclude_nsfw_choice = input("Exclude NSFW posts? (yes/no): ")
-        exclude_nsfw = exclude_nsfw_choice.lower() == "yes"
+        exclude_nsfw_choice = exclude_nsfw
+        # exclude_nsfw = exclude_nsfw_choice.lower() == "yes"
 
     post_info = None
 
     if user_choice == "1":
         post_info = get_hottest_post(subreddit_name, exclude_nsfw)
     elif user_choice == "2":
-        time_filter = input("Enter the time filter (now/today/week/month/year/all time): ")
         post_info = get_top_posts(subreddit_name, exclude_nsfw, time_filter)
     elif user_choice == "3":
-        post_url = input("Enter the post URL: ")
         post_info = get_post_by_url(post_url)
 
     if post_info:

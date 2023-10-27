@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Video Generator</title>
+</head>
+<body>
+    <h1>Your Video Generator</h1>
+    <form id="main-form">
+        <label for="user-choice">Options:</label>
+        <select id="user-choice" name="user-choice" required>
+            <option value="1">Fetch Hottest Post</option>
+            <option value="2">Fetch Top Post by Time Filter</option>
+            <option value="3">Fetch Post by URL</option>
+        </select><br>
+
+        <div id="subreddit-input" style="display: none;">
+            <label for="subreddit-name">Subreddit Name:</label>
+            <input type="text" id="subreddit-name" name="subreddit-name"><br>
+            <label for="exclude-nsfw">Exclude NSFW Posts:</label>
+            <select id="exclude-nsfw" name="exclude-nsfw">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+            </select><br>
+        </div>
+
+        <div id="time-filter-input" style="display: none;">
+            <label for="time-filter">Time Filter:</label>
+            <input type="text" id="time-filter" name="time-filter"><br>
+        </div>
+
+        <div id="post-url-input" style="display: none;">
+            <label for="post-url">Post URL:</label>
+            <input type="text" id="post-url" name="post-url"><br>
+        </div>
+
+        <button type="submit" id="generate-button">Generate Video</button>
+    </form>
+
+    <script>
+        const form = document.getElementById("main-form");
+        const userChoice = document.getElementById("user-choice");
+        const subredditInput = document.getElementById("subreddit-input");
+        const timeFilterInput = document.getElementById("time-filter-input");
+        const postUrlInput = document.getElementById("post-url-input");
+        const excludeNsfw = document.getElementById("exclude-nsfw");
+
+        userChoice.addEventListener("change", function () {
+            if (userChoice.value === "1") {
+                // For "Fetch Hottest Post," hide the time filter input
+                subredditInput.style.display = "block";
+                timeFilterInput.style.display = "none"; // Hide time filter input
+                postUrlInput.style.display = "none";
+            } else if (userChoice.value === "2") {
+                // For "Fetch Top Post by Time Filter," show all inputs
+                subredditInput.style.display = "block";
+                timeFilterInput.style.display = "block";
+                postUrlInput.style.display = "none";
+            } else if (userChoice.value === "3") {
+                // For "Fetch Post by URL," show only the post URL input
+                subredditInput.style.display = "none";
+                timeFilterInput.style.display = "none";
+                postUrlInput.style.display = "block";
+            }
+        });
+
+        form.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const userChoiceValue = userChoice.value;
+            const subredditName = document.getElementById("subreddit-name").value;
+            const excludeNsfwValue = excludeNsfw.value;
+            const timeFilter = document.getElementById("time-filter").value;
+            const postUrl = document.getElementById("post-url").value;
+
+            const response = await fetch("http://localhost:8000/generate_video", {
+                method: "POST",
+                body: JSON.stringify({
+                    userChoice: userChoiceValue,
+                    subredditName,
+                    excludeNsfw: excludeNsfwValue,
+                    timeFilter,
+                    postUrl
+                }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                alert(result.message);
+            } else {
+                alert("An error occurred while processing the request.");
+            }
+        });
+    </script>
+</body>
+</html>
