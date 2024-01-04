@@ -37,13 +37,14 @@ if post_info:
         "comment_urls": comment_urls,
         "post_info": post_info
     }
-    # print(post_and_comments)
+    title_comments = [post_and_comments['post_info']['title']] + [comment['comment_text'] for comment in post_and_comments['post_info']['comments']]
+
 else:
     print("No suitable post found in the specified subreddit.")
 
 # Call your functions from other modules as needed
 screenshot.capture_screenshots(post_id, post_url, comment_urls)
-text2speech.convert_text_to_speech(post_and_comments)
+text2speech.convert_text_to_speech(title_comments)
 bg_vid_download.download_youtube_video()
 short_clip.create_random_short_video()
 video_gen.create_final_video()
@@ -55,4 +56,4 @@ if __name__ == "__main__":
     time_filter = "your_time_filter"
     post_url = "your_post_url"
 
-    process_data(user_choice, subreddit_name, exclude_nsfw, time_filter, post_url)
+    # process_data(user_choice, subreddit_name, exclude_nsfw, time_filter, post_url)

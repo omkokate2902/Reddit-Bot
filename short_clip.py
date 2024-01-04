@@ -21,6 +21,9 @@ def create_random_short_video():
         # Extract the random 90-second clip
         output_clip = video_clip.subclip(start_time, start_time + 90)
 
+        # Mute the audio
+        output_clip = output_clip.set_audio(None)
+
         # Crop the center portion to achieve a 9:16 portrait aspect ratio
         width, height = output_clip.size
         aspect_ratio = 9 / 16
