@@ -13,7 +13,7 @@ def create_final_video():
     audio_dir = 'assets/voices/'
 
     # Output video file path
-    output_path = 'output/final_video.mp4'
+    output_path = 'static/final_video.mp4'
 
     # Load the video clip (90-second video)
     video_clip = VideoFileClip(video_path)

@@ -36,6 +36,10 @@
         <button type="submit" id="generate-button">Generate Video</button>
     </form>
 
+    <!-- Add this after the form in the <body> section -->
+    <video id="generated-video" controls style="display: none;" src="{{ url_for('static', filename='final_video.mp4') }}" type="video/mp4" width="640" height="360"></video>
+
+
     <script>
         const form = document.getElementById("main-form");
         const userChoice = document.getElementById("user-choice");
@@ -89,6 +93,10 @@
             if (response.ok) {
                 const result = await response.json();
                 alert(result.message);
+
+                // Display the generated video
+                const generatedVideo = document.getElementById("generated-video");
+                generatedVideo.style.display = "block";
             } else {
                 alert("An error occurred while processing the request.");
             }
@@ -96,3 +104,4 @@
     </script>
 </body>
 </html>
+

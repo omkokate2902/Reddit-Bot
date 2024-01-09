@@ -11,7 +11,7 @@ import video_gen  # Import the video_gen module or relevant code
 global post_id, post_url, comment_urls, post_and_comments
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 CORS(app)
 
 @app.route('/')
