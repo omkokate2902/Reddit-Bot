@@ -1,23 +1,43 @@
 import os
-from pytube import YouTube
+import yt_dlp
 
-# Function to download a YouTube video if it doesn't already exist
 def download_youtube_video():
-
-    video_url = "https://www.youtube.com/watch?v=n_Dv4JMiwK8&t=1345s&ab_channel=bbswitzer"
+    print("Entering download_youtube_video function...")
+    
+    video_url = "https://www.youtube.com/watch?v=Lt-k-1eD5bE&ab_channel=SpicySauce"  # Test with a known video
     download_dir = "assets/bg_vid"
     desired_filename = "background_video.mp4"
 
-    yt = YouTube(video_url)
-    video_stream = yt.streams.get_highest_resolution()
-    video_title = yt.title
+    print(f"Checking if download directory exists: {download_dir}")
+    if not os.path.exists(download_dir):
+        print(f"Creating directory: {download_dir}")
+        os.makedirs(download_dir)
+    else:
+        print(f"Directory already exists: {download_dir}")
 
-    # Check if the video file already exists in the download directory with the desired filename
+    ydl_opts = {
+        'format': 'best',
+        'outtmpl': os.path.join(download_dir, desired_filename),
+        'noplaylist': True,
+        'verbose': True,
+    }
+
     video_file_path = os.path.join(download_dir, desired_filename)
 
     if os.path.exists(video_file_path):
         print(f"Video '{desired_filename}' already exists in the download directory.")
     else:
-        print(f"Downloading '{video_title}' as '{desired_filename}'...")
-        video_stream.download(output_path=download_dir, filename=desired_filename)
-        print(f"'{desired_filename}' has been downloaded to {download_dir}")
+        try:
+            print(f"Preparing to download video from '{video_url}'...")
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([video_url])
+                print(f"'{desired_filename}' has been downloaded to {download_dir}")
+        except Exception as e:
+            print(f"An error occurred during the download: {e}")
+
+if __name__ == "__main__":
+    try:
+        print("Script is starting...")
+        download_youtube_video()
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")

@@ -53,7 +53,7 @@ def generate_video():
             "comment_urls": comment_urls,
             "post_info": post_info
         }
-        # print(post_and_comments)
+        print(post_and_comments)
     else:
         print("No suitable post found in the specified subreddit.")
 

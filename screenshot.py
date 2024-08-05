@@ -10,7 +10,7 @@ def capture_screenshots(post_id, post_url, comment_urlss):
 
     with sync_playwright() as p:
         # Launch a headless Chromium browser
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(headless=False)
 
         # Create a new browser context with a specific viewport size
         context = browser.new_context(viewport=ViewportSize(width=1920, height=1080))
