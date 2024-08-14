@@ -5,6 +5,7 @@ import text2speech  # Import the text2speech module or relevant code
 import bg_vid_download  # Import the bg_vid_download module or relevant code
 import short_clip  # Import the short_clip module or relevant code
 import video_gen  # Import the video_gen module or relevant code
+import html_screenshot  # Import the html_screenshot module or relevant code
 
 user_choice = input("Options:\n1. Hottest post\n2. Trending post by time filter\n3. Post by URL\n")
 
@@ -43,7 +44,11 @@ else:
     print("No suitable post found in the specified subreddit.")
 
 # Call your functions from other modules as needed
-screenshot.capture_screenshots(post_id, post_url, comment_urls)
+
+# screenshot.capture_screenshots(post_id, post_url, comment_urls)
+html_screenshot.generate_screenshot(post_id, comment_urls)
+
+print("end end end\n")
 text2speech.convert_text_to_speech(title_comments)
 bg_vid_download.download_youtube_video()
 short_clip.create_random_short_video()
