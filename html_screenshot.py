@@ -30,7 +30,7 @@ if config:
     # Function to take a screenshot of a specific HTML element
     def take_screenshot(html_content, output_image, element_class):
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=False)
+            browser = p.chromium.launch(headless=True)
             page = browser.new_page()
             page.set_content(html_content)
 

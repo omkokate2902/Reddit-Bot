@@ -19,7 +19,7 @@ def download_youtube_video():
         'format': 'best',
         'outtmpl': os.path.join(download_dir, desired_filename),
         'noplaylist': True,
-        'verbose': True,
+        'verbose': False,
     }
 
     video_file_path = os.path.join(download_dir, desired_filename)
@@ -31,7 +31,10 @@ def download_youtube_video():
             print(f"Preparing to download video from '{video_url}'...")
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([video_url])
-                print(f"'{desired_filename}' has been downloaded to {download_dir}")
+                if os.path.exists(video_file_path):
+                    print(f"'{desired_filename}' has been downloaded to {download_dir}")
+                else:
+                    print(f"Failed to download '{desired_filename}'. File not found.")
         except Exception as e:
             print(f"An error occurred during the download: {e}")
 
