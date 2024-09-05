@@ -1,5 +1,13 @@
-/assets/bg_vid/background_video.mp4
-/assets/bg_vid/short_video
+# Ignore all files inside specific folders, but keep the folders themselves
+
+/assets/bg_vid/*
+/assets/screenshots/*
+/assets/voices/*
+/static/*
+
+# But do not ignore the folders themselves
+!/*/
+
 config.toml
 /myenv
 /__pycache__

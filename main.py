@@ -46,9 +46,8 @@ else:
 # Call your functions from other modules as needed
 
 # screenshot.capture_screenshots(post_id, post_url, comment_urls)
-html_screenshot.generate_screenshot(post_id, comment_urls)
 
-print("end end end\n")
+html_screenshot.update_html_with_authors_and_comments(post_id, comment_urls, title_comments)
 text2speech.convert_text_to_speech(title_comments)
 bg_vid_download.download_youtube_video()
 short_clip.create_random_short_video()

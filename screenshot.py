@@ -21,6 +21,8 @@ def capture_screenshots(post_id, post_url, comment_urlss):
         try:
             # Navigate to the Reddit post URL
             page.goto(post_url)
+            # content = page.content()
+            # print(content)
 
             # Check if the NSFW button is visible and click it if necessary
             nsfw_button_selector = 'your_selector_for_nsfw_button'

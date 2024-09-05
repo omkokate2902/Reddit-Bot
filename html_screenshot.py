@@ -1,10 +1,10 @@
 import toml
 import praw
-import re
-from jinja2 import Environment, FileSystemLoader
-from playwright.sync_api import sync_playwright, ViewportSize
-from PIL import Image
+from bs4 import BeautifulSoup
+from playwright.sync_api import sync_playwright
+import os
 
+# Function to read the configuration from a TOML file
 def read_config(filename):
     try:
         with open(filename, "r") as file:
@@ -14,9 +14,12 @@ def read_config(filename):
         print("Error reading the config file:", e)
         return None
 
-def login_to_reddit(config):
-    """Log in to Reddit using PRAW."""
-    return praw.Reddit(
+# Load the configuration from the config.toml file
+config = read_config("config.toml")
+
+if config:
+    # Initialize PRAW using credentials from the config file
+    reddit = praw.Reddit(
         client_id=config['reddit']['client_id'],
         client_secret=config['reddit']['client_secret'],
         user_agent=config['reddit']['user_agent'],
@@ -24,113 +27,136 @@ def login_to_reddit(config):
         password=config['reddit']['password']
     )
 
-def generate_screenshot(post_id, comment_urls):
-    # Read configuration and log in to Reddit
-    config = read_config("config.toml")
-    if not config:
-        print("Failed to read configuration.")
-        return None
+    # Function to take a screenshot of a specific HTML element
+    def take_screenshot(html_content, output_image, element_class):
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=False)
+            page = browser.new_page()
+            page.set_content(html_content)
 
-    reddit = login_to_reddit(config)
+            # Define the selector for the comment div
+            comment_selector = f".{element_class}"
+            
+            # Wait for the element to be present
+            page.wait_for_selector(comment_selector, timeout=1000)  # Adjust the timeout as needed
 
-    # Get the submission (post) object using the post ID
-    submission = reddit.submission(id=post_id)
-    
-    # Extract the post author's name
-    post_author = submission.author.name if submission.author else '[Deleted]'
-    
-    # Render the HTML file with the author's name and post title
-    html_file_path = render_html('title.html', author=post_author, title=submission.title)
-
-    # Take a screenshot of the rendered HTML using Playwright
-    capture_screenshots(html_file_path, 'assets/screenshots/post_screenshot.png', comment_urls, post_id)
-
-    # Iterate through the comment URLs
-    for i, comment_url in enumerate(comment_urls):
-        # Extract the comment ID from the URL
-        comment_id = comment_url.split('/')[-2]
-        
-        # Get the comment object using the comment ID
-        comment = reddit.comment(id=comment_id)
-        
-        # Extract the comment author's name and comment text
-        comment_author = comment.author.name if comment.author else '[Deleted]'
-        comment_text = comment.body
-
-        # Render the HTML file with the comment author's name and text
-        html_file_path = render_html('comment.html', author=comment_author, text=comment_text)
-
-        # Take a screenshot of the rendered HTML using Playwright
-        screenshot_filename = f'assets/screenshots/comment_{i+1}_screenshot.png'
-        capture_screenshots(html_file_path, screenshot_filename, [], post_id)
-
-def render_html(template_name, **context):
-    # Set up the Jinja2 environment
-    env = Environment(loader=FileSystemLoader('templates'))
-    template = env.get_template(template_name)
-
-    # Render the template with the context
-    rendered_html = template.render(**context)
-
-    # Write the rendered HTML to the file
-    html_file_path = f'templates/{template_name}'
-    with open(html_file_path, 'w') as f:
-        f.write(rendered_html)
-
-    print(f"HTML file '{template_name}' has been updated with the context: {context}")
-    return html_file_path
-
-def capture_screenshots(html_file_path, output_image_path, comment_urls, post_id):
-    prefix = ""
-
-    with sync_playwright() as p:
-        # Launch a headless Chromium browser
-        browser = p.chromium.launch(headless=False)
-
-        # Create a new browser context with a specific viewport size
-        context = browser.new_context(viewport=ViewportSize(width=1920, height=1080))
-
-        # Create a new page in the context
-        page = context.new_page()
-
-        try:
-            # Navigate to the local HTML file
-            page.goto(f'{prefix}{html_file_path}')
-
-            # Capture a screenshot of the HTML content
-            page.screenshot(path=output_image_path)
-
-            # Open the captured screenshot with PIL for any post-processing
-            image = Image.open(output_image_path)
-
-            # Resize the image if needed
-            new_width = 600
-            w_percent = (new_width / float(image.size[0]))
-            new_height = int((float(image.size[1]) * float(w_percent)))
-            resized_image = image.resize((new_width, new_height), Image.BILINEAR)
-
-            # Save the resized image
-            resized_image.save(output_image_path)
-            print(f"Captured and resized screenshot saved at {output_image_path}")
-
-            # Capture screenshots of comments if provided
-            for index, comment_url in enumerate(comment_urls, start=1):
-                page.goto(f'{prefix}{comment_url}')
-                page.wait_for_timeout(5000)  # Wait for 5 seconds
-
-                comment_screenshot_path = f'{output_image_path}_comment_{index}.png'
-                page.screenshot(path=comment_screenshot_path)
-                print(f"Captured comment screenshot saved at {comment_screenshot_path}")
-
-        finally:
-            # Close the browser to release resources
+            # Take a screenshot of the specified element
+            comment_element = page.locator(comment_selector)
+            comment_element.screenshot(path=output_image)
+            
             browser.close()
 
+    # Combined function to generate authors, comments, and update HTML
+    def update_html_with_authors_and_comments(post_id, comment_urls, title_comments):
+        try:
+            # Fetch the Reddit submission (post)
+            submission = reddit.submission(id=post_id)
+            
+            # Extract the title author's name
+            title_author = submission.author.name if submission.author else "Deleted Account"
+            
+            # Prepare arrays to store authors and titles/comments
+            authors = [title_author]  # Start with the post author's name
+
+            # Loop through each comment URL to extract the comment author
+            for url in comment_urls:
+                comment_id = url.split('/')[-2]  # Extract the comment ID from the URL
+                try:
+                    comment = reddit.comment(id=comment_id)
+                    comment_author = comment.author.name if comment.author else "Deleted Account"
+                    authors.append(comment_author)  # Add comment author to the list
+                except Exception as e:
+                    print(f"Error retrieving comment ID {comment_id}: {e}")
+                    authors.append("Unknown Author")  # Append a placeholder if there's an error
+
+            # Ensure that title_comments is not empty and adjust if necessary
+            if not title_comments:
+                title_comments = ["No comments available"]
+
+            # Update the HTML file for title
+            with open('templates/title.html', 'r') as file:
+                soup = BeautifulSoup(file, 'html.parser')
+
+            # Update the author and title in the HTML using BeautifulSoup
+            author_element = soup.find(id="author")
+            if author_element and len(authors) > 0:
+                author_element.string = authors[0]  # Update with the first author (post author)
+            
+            title_element = soup.find(id="title")
+            if title_element and len(title_comments) > 0:
+                title_element.string = title_comments[0]  # Update with the first comment (post title)
+
+            # Save the updated HTML for the title
+            updated_html_file = 'templates/updated_title.html'
+            with open(updated_html_file, 'w') as file:
+                file.write(str(soup))
+            
+            # Take a screenshot of the updated title HTML
+            take_screenshot(open(updated_html_file).read(), 'assets/screenshots/screenshot_1.png', 'comment')
+
+            # Ensure both lists have the same length to avoid index errors
+            if len(title_comments) - 1 != len(authors) - 1:
+                raise ValueError("The length of title_comments and authors lists do not match.")
+
+            # Now update the HTML file for each comment starting from index 1
+            for i, (comment, author) in enumerate(zip(title_comments[1:], authors[1:]), start=1):  # Skip the 0th element
+                # Load the existing HTML file for each comment
+                with open('templates/title.html', 'r') as file:
+                    soup = BeautifulSoup(file, 'html.parser')
+
+                # Update the title element with the current comment
+                title_element = soup.find(id="title")
+                if title_element:
+                    title_element.string = comment
+
+                # Update the author element with the current comment
+                author_element = soup.find(id="author")
+                if author_element and len(authors) > 0:
+                    author_element.string = author
+
+                # Save the updated HTML for the comment
+                updated_html_file = f'templates/updated_comment_{i}.html'
+                with open(updated_html_file, 'w') as file:
+                    file.write(str(soup))
+
+                # Take a screenshot of the updated comment HTML
+                take_screenshot(open(updated_html_file).read(), f'assets/screenshots/screenshot_{i+1}.png', 'comment')
+
+                # Delete the HTML file after screenshot
+                os.remove(updated_html_file)
+
+            # Also delete the title HTML file after screenshot
+            os.remove('templates/updated_title.html')
+
+        except Exception as e:
+            print("An error occurred while updating the HTML:", e)
+
 # Example usage
-post_id = '1emvvvw'  # Replace with your post ID
+post_id = '1eryb78'
 comment_urls = [
-    'https://www.reddit.com/r/AskReddit/comments/1emvvvw/who_is_an_conventionally_unattractive_person_that/lh1zqza/'
+    'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li22tpu/',
+    'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li1z1oa/',
+    'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li27bk5/',
+    'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li20d26/',
+    'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li1wp67/',
+    'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li20zeh/',
+    'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li23wui/',
+    'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li1wrtq/',
+    'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li1zgi2/',
+    'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li23xbz/'
+]
+title_comments = [
+    'What’s a sexual activity that seems exciting but often turns out to be less enjoyable than anticipated?',
+    'Sex by a river or lake. Mosquitoes on your sack is not an enjoyable experience.',
+    'Sex on the beach. Sand, so much sand.',
+    'Sex in nature. Bugs and mosquitoes eat you alive.',
+    'Sex with your roommates girlfriend.',
+    'Shower sex',
+    'Threesomes with a person you love.',
+    'Sex of any kind in a body of water from a bath tub to an ocean',
+    'Having a big boner then losing it',
+    'Anything in a car.'
 ]
 
-if __name__ == "__main__":
-    generate_screenshot(post_id, comment_urls)
+# Call the function to update HTML and take screenshots
+# update_html_with_authors_and_comments(post_id, comment_urls, title_comments)
