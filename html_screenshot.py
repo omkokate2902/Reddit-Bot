@@ -94,6 +94,9 @@ if config:
             # Take a screenshot of the updated title HTML
             take_screenshot(open(updated_html_file).read(), 'assets/screenshots/screenshot_1.png', 'comment')
 
+            print(f"Saved screenshot_1.png")
+
+
             # Ensure both lists have the same length to avoid index errors
             if len(title_comments) - 1 != len(authors) - 1:
                 raise ValueError("The length of title_comments and authors lists do not match.")
@@ -127,6 +130,9 @@ if config:
 
             # Also delete the title HTML file after screenshot
             os.remove('templates/updated_title.html')
+
+            print("Saved comments screenshots")
+
 
         except Exception as e:
             print("An error occurred while updating the HTML:", e)

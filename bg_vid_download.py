@@ -16,10 +16,10 @@ def download_youtube_video():
         print(f"Directory already exists: {download_dir}")
 
     ydl_opts = {
-        'format': 'best',
+        'format': 'bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/best[height<=720][ext=mp4]',
         'outtmpl': os.path.join(download_dir, desired_filename),
         'noplaylist': True,
-        'verbose': False,
+        'verbose': True,
     }
 
     video_file_path = os.path.join(download_dir, desired_filename)
