@@ -3,7 +3,6 @@
 /assets/bg_vid/*
 /assets/screenshots/*
 /assets/voices/*
-/static/*
 
 # But do not ignore the folders themselves
 !/*/

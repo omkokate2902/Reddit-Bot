@@ -138,31 +138,31 @@ if config:
             print("An error occurred while updating the HTML:", e)
 
 # Example usage
-post_id = '1eryb78'
-comment_urls = [
-    'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li22tpu/',
-    'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li1z1oa/',
-    'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li27bk5/',
-    'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li20d26/',
-    'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li1wp67/',
-    'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li20zeh/',
-    'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li23wui/',
-    'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li1wrtq/',
-    'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li1zgi2/',
-    'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li23xbz/'
-]
-title_comments = [
-    'What’s a sexual activity that seems exciting but often turns out to be less enjoyable than anticipated?',
-    'Sex by a river or lake. Mosquitoes on your sack is not an enjoyable experience.',
-    'Sex on the beach. Sand, so much sand.',
-    'Sex in nature. Bugs and mosquitoes eat you alive.',
-    'Sex with your roommates girlfriend.',
-    'Shower sex',
-    'Threesomes with a person you love.',
-    'Sex of any kind in a body of water from a bath tub to an ocean',
-    'Having a big boner then losing it',
-    'Anything in a car.'
-]
+# post_id = '1eryb78'
+# comment_urls = [
+#     'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li22tpu/',
+#     'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li1z1oa/',
+#     'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li27bk5/',
+#     'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li20d26/',
+#     'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li1wp67/',
+#     'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li20zeh/',
+#     'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li23wui/',
+#     'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li1wrtq/',
+#     'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li1zgi2/',
+#     'https://www.reddit.com/r/AskReddit/comments/1eryb78/whats_a_sexual_activity_that_seems_exciting_but/li23xbz/'
+# ]
+# title_comments = [
+#     'What’s a sexual activity that seems exciting but often turns out to be less enjoyable than anticipated?',
+#     'Sex by a river or lake. Mosquitoes on your sack is not an enjoyable experience.',
+#     'Sex on the beach. Sand, so much sand.',
+#     'Sex in nature. Bugs and mosquitoes eat you alive.',
+#     'Sex with your roommates girlfriend.',
+#     'Shower sex',
+#     'Threesomes with a person you love.',
+#     'Sex of any kind in a body of water from a bath tub to an ocean',
+#     'Having a big boner then losing it',
+#     'Anything in a car.'
+# ]
 
 # Call the function to update HTML and take screenshots
 # update_html_with_authors_and_comments(post_id, comment_urls, title_comments)

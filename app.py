@@ -2,7 +2,8 @@ from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 
 import reddit  # Import the reddit module or relevant code
-import screenshot  # Import the screenshot module or relevant code
+# import screenshot  # Import the screenshot module or relevant code
+import html_screenshot  # Import the html_screenshot module or relevant code
 import text2speech  # Import the text2speech module or relevant code
 import bg_vid_download  # Import the bg_vid_download module or relevant code
 import short_clip  # Import the short_clip module or relevant code
@@ -63,7 +64,8 @@ def generate_video():
     # Combine the title and comments into a single list
     title_comments = [title] + comments
 
-    screenshot.capture_screenshots(post_id, post_url, comment_urls)
+    html_screenshot.update_html_with_authors_and_comments(post_id, comment_urls, title_comments)
+    # screenshot.capture_screenshots(post_id, post_url, comment_urls)
     text2speech.convert_text_to_speech(title_comments)
     bg_vid_download.download_youtube_video()
     short_clip.create_random_short_video()
