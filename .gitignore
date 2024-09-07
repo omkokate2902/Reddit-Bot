@@ -1,6 +1,6 @@
 # Ignore all files inside specific folders, but keep the folders themselves
 
-/assets/bg_vid/*
+# /assets/bg_vid/*
 /assets/screenshots/*
 /assets/voices/*
 

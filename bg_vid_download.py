@@ -4,7 +4,7 @@ import yt_dlp
 def download_youtube_video():
     print("Entering download_youtube_video function...")
     
-    video_url = "https://www.youtube.com/watch?v=Lt-k-1eD5bE&ab_channel=SpicySauce"  # Test with a known video
+    video_url = "https://www.youtube.com/watch?v=pQx_2LmNF8M"  # Test with a known video
     download_dir = "assets/bg_vid"
     desired_filename = "background_video.mp4"
 
@@ -16,7 +16,7 @@ def download_youtube_video():
         print(f"Directory already exists: {download_dir}")
 
     ydl_opts = {
-        'format': 'bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/best[height<=720][ext=mp4]',
+        'format': 'bestvideo[height<=480][ext=mp4]/best[height<=480][ext=mp4]',
         'outtmpl': os.path.join(download_dir, desired_filename),
         'noplaylist': True,
         'verbose': True,
