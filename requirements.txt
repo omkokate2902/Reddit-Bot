@@ -1,3 +1,4 @@
+anyio==4.4.0
 attrs==23.1.0
 beautifulsoup4==4.12.3
 Brotli==1.1.0
@@ -17,6 +18,8 @@ greenlet==2.0.2
 gTTS==2.4.0
 h11==0.14.0
 html5lib==1.1
+httpcore==1.0.5
+httpx==0.27.2
 idna==3.4
 imageio==2.31.5
 imageio-ffmpeg==0.4.9
@@ -64,5 +67,7 @@ websocket-client==1.6.1
 websockets==12.0
 Werkzeug==2.0.2
 wsproto==1.2.0
+youtube-dl==2021.12.17
+youtube-search-python==1.6.6
 yt-dlp==2024.8.1
 zopfli==0.2.3
