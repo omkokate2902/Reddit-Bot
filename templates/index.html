@@ -76,7 +76,7 @@
             const postUrl = document.getElementById("post-url").value;
 
             // Submit the form data via Fetch API
-            const response = await fetch("/generate_video", {
+            const response = await fetch("http://127.0.0.1:8000/generate_video", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
